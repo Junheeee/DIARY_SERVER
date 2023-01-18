@@ -26,15 +26,23 @@ public class CstmrController {
     @PostMapping(value = "/login")
     public ResponseEntity<? extends BasicResponse> login(@RequestBody CstmrModel rq) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
+        CstmrModel result = null;
+        if(rq == null || rq.getUserId() == null || rq.getUserPswd() == null) {
+//            resultMap.put("result", null);
+            result = null;
+        } else {
+
         try{
-            resultMap.put("result", service.login(rq));
+//            resultMap.put("result", service.login(rq));
+            result = service.login(rq);
         } catch(Exception e) {
             log.error("IGNORE : {}", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorResponse("Server Error", "-1"));
         }
+        }
 
-        return ResponseEntity.ok().body(new SuccessResponse<>(resultMap));
+        return ResponseEntity.ok().body(new SuccessResponse<>(result));
     }
 
 }
