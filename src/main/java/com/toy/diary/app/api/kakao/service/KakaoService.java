@@ -103,7 +103,7 @@ public class KakaoService {
         return userInfo;
     }
 
-    public int unlink(String token) throws IOException{
+    public int unlink(String token) throws IOException {
         URL url = new URL("https://kapi.kakao.com/v1/user/unlink");
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
