@@ -10,11 +10,12 @@ import java.util.Date;
 @Entity
 @Table(name="cstmr_dtl")
 @Data
-@NamedQuery(name="CstmrDtl.findAll", query="SELECT c FROM CstrmDtl c")
-public class CstrmDtl implements Serializable {
+@NamedQuery(name="CstmrDtl.findAll", query="SELECT c FROM CstmrDtl c")
+public class CstmrDtl implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name="CSTMR_SNO")
     private int cstmrSno;
 

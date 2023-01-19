@@ -27,7 +27,7 @@ public class KakaoController {
     private KakaoService kakaoService;
 
     @GetMapping("/login")
-    public ResponseEntity<?> realLogin(@RequestParam("token") String token) throws IOException {
+    public ResponseEntity<?> realLogin(@RequestParam("token") String token) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
         try{
             resultMap = kakaoService.login(token);
@@ -58,20 +58,16 @@ public class KakaoController {
     }
 
     @GetMapping("/unlink")
-    public ResponseEntity<?> unlink(@RequestParam("token") String token) throws IOException {
+    public ResponseEntity<?> unlink(@RequestParam("token") String token) {
         Map<String, Object> resultMap = new HashMap<String, Object>();
-
-        URL url = new URL("https://kapi.kakao.com/v1/user/unlink");
-        HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
-
-        urlConnection.setRequestProperty("Authorization", "Bearer " + token);
-        urlConnection.setRequestMethod("POST");
-
-        int result = urlConnection.getResponseCode();
-        resultMap.put("code", result);
-
-        log.info("response code: " + result);
-
+        try{
+            int result = kakaoService.unlink(token);
+            resultMap.put("code", result);
+        } catch(Exception e) {
+            log.error("IGONE : {}", e);
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(new ErrorResponse("Server Error", "-1"));
+        }
         return ResponseEntity.ok().body(new SuccessResponse<>(resultMap));
     }
 }
