@@ -33,4 +33,10 @@ public class CstmrBas implements Serializable {
 
     @Column(name="PSWD_UPDT_DT")
     private Date pswdUpdtDt;
+
+    @Column(name="RFRSH_TOKEN")
+    private String rfrshToken;
+
+    @Column(name="CSTMR_STATUS_CD")
+    private String cstmrStatusCd;
 }
