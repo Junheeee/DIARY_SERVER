@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.toy.diary.app.api.cstmr.model.CstmrModel;
+import com.toy.diary.app.api.jwt.model.JwtUserModel;
 import com.toy.diary.app.jpa.entity.CstmrBas;
 import com.toy.diary.app.jpa.entity.CstmrDtl;
 import com.toy.diary.app.jpa.entity.QCstmrBas;
@@ -55,5 +56,31 @@ public class CstmrBasQueryRepository {
                         .fetchOne();
 
         return result;
+    }
+
+    public JwtUserModel findUserPassword(String userId) {
+        QCstmrBas bas = QCstmrBas.cstmrBas;
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(bas.userId.eq(userId));
+
+        CstmrBas entity = query.select(bas)
+                .from(bas)
+                .where(builder)
+                .fetchFirst();
+
+        if(entity != null) {
+            JwtUserModel model = new JwtUserModel();
+            model.setUserId(entity.getUserId());
+            model.setCstmrSno(entity.getCstmrSno());
+            model.setUserPswd(entity.getUserPswd());
+            model.setCstmrStatusCd(entity.getCstmrStatusCd());
+
+            return model;
+        } else {
+            return null;
+        }
+
+
     }
 }
