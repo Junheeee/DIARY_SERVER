@@ -26,7 +26,8 @@ public class KakaoQueryRepository {
                         bas.cstmrSno,
                         bas.userId,
                         bas.useYn,
-                        bas.joinDt
+                        bas.joinDt,
+                        bas.cstmrStatusCd
                 ))
                 .from(bas)
                 .where(builder)

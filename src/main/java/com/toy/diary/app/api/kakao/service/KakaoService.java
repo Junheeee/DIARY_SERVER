@@ -1,5 +1,9 @@
 package com.toy.diary.app.api.kakao.service;
 
+import com.toy.diary.app.api.jwt.model.JwtRsModel;
+import com.toy.diary.app.api.jwt.model.JwtUserModel;
+import com.toy.diary.app.api.jwt.service.JwtUserDetailsService;
+import com.toy.diary.app.api.jwt.utils.JwtTokenUtil;
 import com.toy.diary.app.jpa.entity.CstmrBas;
 import com.toy.diary.app.jpa.entity.CstmrDtl;
 import com.toy.diary.app.jpa.repository.CstmrBasQueryRepository;
@@ -11,6 +15,7 @@ import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 
 import java.io.*;
@@ -36,9 +41,15 @@ public class KakaoService {
     @Autowired
     CstmrBasQueryRepository cstmrBasQueryRepository;
 
-    public Map<String, Object> login(String token) {
+    @Autowired
+    private JwtTokenUtil jwtTokenUtil;
+
+    @Autowired
+    private JwtUserDetailsService userDetailsService;
+
+    public Map<String, Object> login(String token) throws Exception {
         String host = "https://kapi.kakao.com/v2/user/me";
-        Map<String, Object> userInfo = new HashMap<>();
+        Map<String, Object> resultMap = new HashMap<>();
         try{
             URL url = new URL(host);
 
@@ -47,7 +58,7 @@ public class KakaoService {
             urlConnection.setRequestMethod("GET");
 
             int responseCode = urlConnection.getResponseCode();
-            System.out.println("responseCode = " + responseCode);
+            log.info("responseCode = " + responseCode);
 
             BufferedReader br = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             String line = "";
@@ -63,10 +74,10 @@ public class KakaoService {
 
             String id = obj.get("id").toString();
             String nickname = properties.get("nickname").toString();
-//            String email = properties.get("")
+            String email = kakao_account.get("email").toString();
 
-            userInfo.put("id", id);
-            userInfo.put("nickname", nickname);
+//            userInfo.put("id", id);
+//            userInfo.put("nickname", nickname);
 
             CstmrBas bas = new CstmrBas();
             CstmrDtl dtl = new CstmrDtl();
@@ -78,6 +89,14 @@ public class KakaoService {
             if(checkResult != null) {
                 if(checkResult.getUseYn().equals("Y")) {
                     //계정연동 잘되어 있는 경우 -> 그냥 로그인~
+                    JwtUserModel userDetails = new JwtUserModel();
+                    userDetails.setUserId(checkResult.getUserId());
+                    userDetails.setCstmrSno(checkResult.getCstmrSno());
+                    userDetails.setCstmrStatusCd(checkResult.getCstmrStatusCd());
+
+                    JwtRsModel result = userDetailsService.tokenIssue(userDetails);
+                    resultMap.put("result", result);
+
                 } else {
                     //등록은 해봤는데 연결해제 해서 논리삭제 된 경우
                     checkResult.setUseYn("Y");
@@ -100,15 +119,16 @@ public class KakaoService {
             e.printStackTrace();
         }
 
-        return userInfo;
+        return resultMap;
     }
 
-    public int unlink(String token) throws IOException {
+    public int unlink(String token) throws Exception {
         URL url = new URL("https://kapi.kakao.com/v1/user/unlink");
         HttpURLConnection urlConnection = (HttpURLConnection) url.openConnection();
 
         Map<String, Object> userInfo = this.login(token);
-        String id = (String)userInfo.get("id");
+//        String id = (String)userInfo.get("id");
+        JwtRsModel userDetails = (JwtRsModel)userInfo.get("result");
 
         urlConnection.setRequestProperty("Authorization", "Bearer " + token);
         urlConnection.setRequestMethod("POST");
@@ -116,7 +136,8 @@ public class KakaoService {
         int result = urlConnection.getResponseCode();
 
         if(result == 200) {
-            CstmrBas bas = cstmrBasQueryRepository.unlinkBas(id);
+//            CstmrBas bas = cstmrBasQueryRepository.unlinkBas(id);
+            CstmrBas bas = cstmrBasQueryRepository.unlinkBas(userDetails.getUserId());
             bas.setUseYn("N");
             cstmrBasRepository.save(bas);
         }

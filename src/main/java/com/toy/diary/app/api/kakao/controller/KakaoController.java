@@ -2,6 +2,7 @@ package com.toy.diary.app.api.kakao.controller;
 
 import com.toy.diary.app.api.comn.response.ErrorResponse;
 import com.toy.diary.app.api.comn.response.SuccessResponse;
+import com.toy.diary.app.api.jwt.model.JwtRsModel;
 import com.toy.diary.app.api.kakao.service.KakaoService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -27,15 +28,17 @@ public class KakaoController {
 
     @GetMapping("/login")
     public ResponseEntity<?> realLogin(@RequestParam("token") String token) {
-        Map<String, Object> resultMap = new HashMap<String, Object>();
+        JwtRsModel result = new JwtRsModel();
         try{
-            resultMap = kakaoService.login(token);
+            Map<String, Object> resultMap = kakaoService.login(token);
+            result = (JwtRsModel) resultMap.get("result");
         } catch(Exception e) {
             log.error("IGONE : {}", e);
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body(new ErrorResponse("Server Error", "-1"));
         }
-        return ResponseEntity.ok().body(new SuccessResponse<>(resultMap));
+//        return ResponseEntity.ok().body(new SuccessResponse<>(resultMap));
+        return ResponseEntity.ok().body(new SuccessResponse<>(result));
     }
 
     @GetMapping("/logout")

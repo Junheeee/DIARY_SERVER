@@ -4,6 +4,7 @@ import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Projections;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import com.toy.diary.app.api.cstmr.model.CstmrModel;
+import com.toy.diary.app.api.jwt.model.JwtProfileRsModel;
 import com.toy.diary.app.api.jwt.model.JwtUserModel;
 import com.toy.diary.app.jpa.entity.CstmrBas;
 import com.toy.diary.app.jpa.entity.CstmrDtl;
@@ -34,9 +35,50 @@ public class CstmrBasQueryRepository {
                         .where(builder)
                         .fetchOne();
 
+        return result;
+    }
 
+    public CstmrBas kakaoUserCheck(String id) {
+        QCstmrBas bas = QCstmrBas.cstmrBas;
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(bas.userId.eq(id));
+
+        CstmrBas result = query.select(Projections.bean(CstmrBas.class,
+                        bas.cstmrSno,
+                        bas.userId,
+                        bas.useYn,
+                        bas.joinDt,
+                        bas.cstmrStatusCd
+                ))
+                .from(bas)
+                .where(builder)
+                .fetchOne();
 
         return result;
+    }
+
+    public JwtProfileRsModel findUserProfile(int cstmrSno) {
+        QCstmrBas basEntity = QCstmrBas.cstmrBas;
+        QCstmrDtl dtlEntity = QCstmrDtl.cstmrDtl;
+
+        BooleanBuilder builder = new BooleanBuilder();
+        builder.and(basEntity.cstmrSno.eq(cstmrSno));
+
+
+        JwtProfileRsModel model = query.select(Projections.bean(JwtProfileRsModel.class ,
+                        basEntity.cstmrSno,
+                        basEntity.userId,
+                        dtlEntity.memberNm
+                ))
+                .from(basEntity)
+                .leftJoin(dtlEntity)
+                .on(basEntity.cstmrSno.eq(dtlEntity.cstmrSno))
+                .where(builder)
+                .fetchFirst();
+
+        return model;
+
     }
 
     public CstmrBas unlinkBas(String id) {
@@ -50,7 +92,8 @@ public class CstmrBasQueryRepository {
                         bas.cstmrSno,
                         bas.useYn,
                         bas.userId,
-                        bas.joinDt
+                        bas.joinDt,
+                        bas.cstmrStatusCd
                         )).from(bas)
                         .where(builder)
                         .fetchOne();
@@ -64,6 +107,7 @@ public class CstmrBasQueryRepository {
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(bas.userId.eq(userId));
 
+        //입력ID값이 DB랑 일치하는지 체크
         CstmrBas entity = query.select(bas)
                 .from(bas)
                 .where(builder)
@@ -80,7 +124,5 @@ public class CstmrBasQueryRepository {
         } else {
             return null;
         }
-
-
     }
 }
