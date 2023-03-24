@@ -25,8 +25,8 @@ public class BoardService {
     @Autowired
     private BoardBasRepository repository;
 
-    public List<BoardRsModel> apple() {
-        List<BoardRsModel> model = query.apple();
+    public List<BoardRsModel> list() {
+        List<BoardRsModel> model = query.list();
         return model;
     }
 

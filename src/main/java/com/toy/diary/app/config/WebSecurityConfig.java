@@ -34,8 +34,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     private JwtRequestFilter jwtRequestFilter;
 
     private final String[] PERMITTED_URL = {
-            "/api/**",
+//            "/api/**",
             "/api/jwt/**",
+            "/api/kakao/**",
+            "/api/board/**",
             "/v2/api-docs",
             "/configuration/ui",
             "/configuration/security",

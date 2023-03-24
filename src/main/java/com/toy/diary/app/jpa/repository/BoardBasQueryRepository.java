@@ -19,7 +19,7 @@ import java.util.List;
 public class BoardBasQueryRepository {
     private final JPAQueryFactory query;
 
-    public List<BoardRsModel> apple() {
+    public List<BoardRsModel> list() {
         QBoardBas bas = QBoardBas.boardBas;
         BooleanBuilder builder = new BooleanBuilder();
         builder.and(bas.delYn.eq("N"));

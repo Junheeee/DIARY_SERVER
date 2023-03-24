@@ -53,6 +53,7 @@ public class JwtTokenUtil implements Serializable {
 
     //for retrieveing any information from token we will need the secret key
     private Claims getAllClaimsFromToken(String token) {
+        log.info(token);
         return Jwts.parser().setSigningKey(secret).parseClaimsJws(token).getBody();
     }
 
@@ -98,6 +99,7 @@ public class JwtTokenUtil implements Serializable {
     public String getUserIdByToken() {
         HttpServletRequest rq = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
         String token = rq.getHeader("Authorization");
+        log.info(token);
 
         if(token == null || "".equals(token)) return null;
 

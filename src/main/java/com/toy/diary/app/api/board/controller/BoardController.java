@@ -27,11 +27,11 @@ public class BoardController {
     @Autowired
     private BoardService service;
 
-    @GetMapping(value = "/apple")
-    public ResponseEntity<? extends BasicResponse> apple() {
+    @GetMapping(value = "/list")
+    public ResponseEntity<? extends BasicResponse> list() {
 
         List<BoardRsModel> result = null;
-        result = service.apple();
+        result = service.list();
 
         return ResponseEntity.ok().body(new SuccessResponse<List>(result));
     }
